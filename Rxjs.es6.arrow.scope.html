@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/4.0.6/rx.all.js"></script>
+<script>
+  /**
+   * Testing Rxjs subscriber scope between es5 functions and es6 arrow functions
+   */
+  
+"use strict"
+
+const myModule = function() {
+
+  let modulescope = this,
+    o = Rx.Observable.interval(100).take(3),
+    s;
+
+  function createSubscriber() {
+    s = o.subscribe(function(v) {
+      console.log('Scope in obs',this);
+      //this.thing();
+      this.another();
+    })
+  }
+
+  function thing() {
+    console.log('Thing: ',this);
+    // console.log('Thing: is module scope? '+(this === modulescope));
+    // console.log('Thing: find handler? '+ handler);
+    //modulescope.handler('a Hello from thing');
+  }
+
+  const another = () => {
+    console.log('Another: ',this);
+    // console.log('Another: is module scope? '+(this === modulescope));
+    // console.log('Another: find handler? '+ handler);
+    //modulescope.handler('b Hello from another');
+  };
+
+  function handler(msg) {
+    console.log('Is module scope? ' + (this === modulescope));
+    console.log('Is window scope? ' + (this === window));
+    console.log('handler ' + msg);
+  }
+
+  return {
+    createSubscriber: createSubscriber,
+    thing : thing,
+    another: another
+  };
+
+};
+
+
+const myInstance = myModule.call(null);
+
+myInstance.createSubscriber();
+
+
+//myInstance.thing.call(window);
+//myInstance.another.call(window);
+
+</script>
+  <title>JS Bin</title>
+</head>
+<body>
+<h1>Experiesting - Experiment /testing</h1>
+<p>View the console</p>
+</body>
+</html>
