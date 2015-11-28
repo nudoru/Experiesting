@@ -7,17 +7,40 @@
    * Vue.js can wrap regular objects and turn props in to getters/setters with define properties
    */
 
-"use strict"
+"use strict";
 
 
 let myObj = {a:'foo',b:'bar'};
 
-const wrapObj = (src) => {
+const wrapObj = (srcObj) => {
+  Object.keys(src).forEach(k => {
 
+    let internal = '__'+k;
+//    src[internal] =  src[k];
+
+    Object.defineProperty(srcObj, internal, {
+     value: srcObj[k], enumerable: false, configurable: false, writable: true
+    });
+
+    Object.defineProperty(srcObj, k, {
+      get: function() {
+        console.log('getting value');
+        return this[internal];
+      },
+      set: function(newValue) {
+        console.log('setting value');
+        this[internal] = newValue;
+     }, enumerable: true, configurable: false
+    });
+  });
 };
 
+// console.log('Before:',myObj.a);
 
+wrapObj(myObj);
 
+// console.log('After:',myObj.a);
+// console.log('After:',myObj.a = 'foobar');
 
 </script>
   <title>Experiesting - Experiment / testing</title>
